@@ -159,9 +159,9 @@ func (m model) View() string {
 			m.baudRate.View(),
 		) + "\n"
 	} else if state == 2 {
-		s += fmt.Sprintf("Press enter to start tcp server for the port %s and at baud rate of %s:\n", m.selectedPort, m.baudRate.Value())
+		s += fmt.Sprintf("Press enter to start http server for the port %s and at baud rate of %s:\n", m.selectedPort, m.baudRate.Value())
 	} else if state == 3 {
-		s += fmt.Sprintf("Serving at %s", m.host)
+		s += fmt.Sprintf("Serving http server at %s", m.host)
 	}
 	s += "\nPress q to quit.\n"
 	return s
