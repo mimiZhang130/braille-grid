@@ -2207,6 +2207,7 @@ process.umask = function() { return 0; };
 },{}],5:[function(require,module,exports){
 const OpenAI = require('openai');
 const br = require('braille');
+const printStream = require('./printStream');
 const url = 'http://localhost:3000';
 
 async function chat(key, text) {
@@ -2236,7 +2237,7 @@ ${text}
             return response;
         })
         .then(data => {
-            console.log('Response:', data);
+            printStream(data.body);
         })
         .catch(error => {
             console.error('Error:', error.message);
@@ -2246,7 +2247,7 @@ ${text}
 module.exports = chat;
 
 
-},{"braille":8,"openai":16}],6:[function(require,module,exports){
+},{"./printStream":7,"braille":9,"openai":17}],6:[function(require,module,exports){
 const tokenize = require('./tokenize');
 const chat = require('./chat');
 
@@ -2276,7 +2277,28 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 
-},{"./chat":5,"./tokenize":7}],7:[function(require,module,exports){
+},{"./chat":5,"./tokenize":8}],7:[function(require,module,exports){
+async function printStream(stream) {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                break;
+            }
+            const decodedString = decoder.decode(value);
+            console.log("Decoded response from service:", decodedString);
+        }
+    } finally {
+        reader.releaseLock();
+    }
+}
+
+module.exports = printStream;
+
+},{}],8:[function(require,module,exports){
 function tokenize(text, groupSize) {
     const words = text.split(/\s+/);
     
@@ -2300,7 +2322,7 @@ function tokenize(text, groupSize) {
 
 module.exports = tokenize;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * braille
  * https://github.com/Nonemoticoner/braille
@@ -2390,7 +2412,7 @@ module.exports = {
 	
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MultipartBody = void 0;
@@ -2407,7 +2429,7 @@ class MultipartBody {
 }
 exports.MultipartBody = MultipartBody;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -2429,7 +2451,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 __exportStar(require("../web-runtime.js"), exports);
 
-},{"../web-runtime.js":13}],11:[function(require,module,exports){
+},{"../web-runtime.js":14}],12:[function(require,module,exports){
 /**
  * Disclaimer: modules in _shims aren't intended to be imported by SDK users.
  */
@@ -2444,7 +2466,7 @@ for (const property of Object.keys(shims)) {
   });
 }
 
-},{"./registry":12,"openai/_shims/auto/runtime":10}],12:[function(require,module,exports){
+},{"./registry":13,"openai/_shims/auto/runtime":11}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setShims = exports.isFsReadStream = exports.fileFromPath = exports.getDefaultAgent = exports.getMultipartRequestOptions = exports.ReadableStream = exports.File = exports.Blob = exports.FormData = exports.Headers = exports.Response = exports.Request = exports.fetch = exports.kind = exports.auto = void 0;
@@ -2486,7 +2508,7 @@ function setShims(shims, options = { auto: false }) {
 }
 exports.setShims = setShims;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRuntime = void 0;
@@ -2565,7 +2587,7 @@ function getRuntime({ manuallyImported } = {}) {
 }
 exports.getRuntime = getRuntime;
 
-},{"./MultipartBody.js":9}],14:[function(require,module,exports){
+},{"./MultipartBody.js":10}],15:[function(require,module,exports){
 (function (process,Buffer){(function (){
 "use strict";
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
@@ -3447,7 +3469,7 @@ function isObj(obj) {
 exports.isObj = isObj;
 
 }).call(this)}).call(this,require('_process'),require("buffer").Buffer)
-},{"./_shims/index.js":11,"./error.js":15,"./streaming.js":58,"./uploads.js":59,"./version.js":60,"_process":4,"buffer":2}],15:[function(require,module,exports){
+},{"./_shims/index.js":12,"./error.js":16,"./streaming.js":59,"./uploads.js":60,"./version.js":61,"_process":4,"buffer":2}],16:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3596,7 +3618,7 @@ class InternalServerError extends APIError {
 }
 exports.InternalServerError = InternalServerError;
 
-},{"./core.js":14}],16:[function(require,module,exports){
+},{"./core.js":15}],17:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -3741,7 +3763,7 @@ exports.fileFromPath = Uploads.fileFromPath;
 exports = module.exports = OpenAI;
 exports.default = OpenAI;
 
-},{"./core.js":14,"./error.js":15,"./uploads.js":59,"openai/pagination":26,"openai/resources/index":54}],17:[function(require,module,exports){
+},{"./core.js":15,"./error.js":16,"./uploads.js":60,"openai/pagination":27,"openai/resources/index":55}],18:[function(require,module,exports){
 "use strict";
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
@@ -3988,7 +4010,7 @@ class AbstractAssistantStreamRunner {
 exports.AbstractAssistantStreamRunner = AbstractAssistantStreamRunner;
 _AbstractAssistantStreamRunner_connectedPromise = new WeakMap(), _AbstractAssistantStreamRunner_resolveConnectedPromise = new WeakMap(), _AbstractAssistantStreamRunner_rejectConnectedPromise = new WeakMap(), _AbstractAssistantStreamRunner_endPromise = new WeakMap(), _AbstractAssistantStreamRunner_resolveEndPromise = new WeakMap(), _AbstractAssistantStreamRunner_rejectEndPromise = new WeakMap(), _AbstractAssistantStreamRunner_listeners = new WeakMap(), _AbstractAssistantStreamRunner_ended = new WeakMap(), _AbstractAssistantStreamRunner_errored = new WeakMap(), _AbstractAssistantStreamRunner_aborted = new WeakMap(), _AbstractAssistantStreamRunner_catchingPromiseCreated = new WeakMap(), _AbstractAssistantStreamRunner_handleError = new WeakMap();
 
-},{"openai/error":15}],18:[function(require,module,exports){
+},{"openai/error":16}],19:[function(require,module,exports){
 "use strict";
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
@@ -4508,7 +4530,7 @@ _AbstractChatCompletionRunner_connectedPromise = new WeakMap(), _AbstractChatCom
             : JSON.stringify(rawContent));
 };
 
-},{"./RunnableFunction.js":23,"./chatCompletionUtils.js":25,"openai/error":15}],19:[function(require,module,exports){
+},{"./RunnableFunction.js":24,"./chatCompletionUtils.js":26,"openai/error":16}],20:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -5057,7 +5079,7 @@ _AssistantStream_addEvent = function _AssistantStream_addEvent(event) {
     }
 };
 
-},{"./AbstractAssistantStreamRunner.js":17,"openai/core":14,"openai/error":15,"openai/streaming":58}],20:[function(require,module,exports){
+},{"./AbstractAssistantStreamRunner.js":18,"openai/core":15,"openai/error":16,"openai/streaming":59}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatCompletionRunner = void 0;
@@ -5092,7 +5114,7 @@ class ChatCompletionRunner extends AbstractChatCompletionRunner_1.AbstractChatCo
 }
 exports.ChatCompletionRunner = ChatCompletionRunner;
 
-},{"./AbstractChatCompletionRunner.js":18,"./chatCompletionUtils.js":25}],21:[function(require,module,exports){
+},{"./AbstractChatCompletionRunner.js":19,"./chatCompletionUtils.js":26}],22:[function(require,module,exports){
 "use strict";
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
@@ -5405,7 +5427,7 @@ function str(x) {
     return JSON.stringify(x);
 }
 
-},{"./AbstractChatCompletionRunner.js":18,"openai/error":15,"openai/streaming":58}],22:[function(require,module,exports){
+},{"./AbstractChatCompletionRunner.js":19,"openai/error":16,"openai/streaming":59}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatCompletionStreamingRunner = void 0;
@@ -5438,7 +5460,7 @@ class ChatCompletionStreamingRunner extends ChatCompletionStream_1.ChatCompletio
 }
 exports.ChatCompletionStreamingRunner = ChatCompletionStreamingRunner;
 
-},{"./ChatCompletionStream.js":21}],23:[function(require,module,exports){
+},{"./ChatCompletionStream.js":22}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParsingToolFunction = exports.ParsingFunction = exports.isRunnableFunctionWithParse = void 0;
@@ -5474,7 +5496,7 @@ class ParsingToolFunction {
 }
 exports.ParsingToolFunction = ParsingToolFunction;
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allSettledWithThrow = void 0;
@@ -5501,7 +5523,7 @@ const allSettledWithThrow = async (promises) => {
 };
 exports.allSettledWithThrow = allSettledWithThrow;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isPresent = exports.isToolMessage = exports.isFunctionMessage = exports.isAssistantMessage = void 0;
@@ -5522,7 +5544,7 @@ function isPresent(obj) {
 }
 exports.isPresent = isPresent;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5587,7 +5609,7 @@ class CursorPage extends core_1.AbstractPage {
 }
 exports.CursorPage = CursorPage;
 
-},{"./core.js":14}],27:[function(require,module,exports){
+},{"./core.js":15}],28:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5599,7 +5621,7 @@ class APIResource {
 }
 exports.APIResource = APIResource;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -5646,7 +5668,7 @@ exports.Audio = Audio;
     Audio.Speech = SpeechAPI.Speech;
 })(Audio = exports.Audio || (exports.Audio = {}));
 
-},{"openai/resource":27,"openai/resources/audio/speech":29,"openai/resources/audio/transcriptions":30,"openai/resources/audio/translations":31}],29:[function(require,module,exports){
+},{"openai/resource":28,"openai/resources/audio/speech":30,"openai/resources/audio/transcriptions":31,"openai/resources/audio/translations":32}],30:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5664,7 +5686,7 @@ exports.Speech = Speech;
 (function (Speech) {
 })(Speech = exports.Speech || (exports.Speech = {}));
 
-},{"openai/resource":27}],30:[function(require,module,exports){
+},{"openai/resource":28}],31:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5683,7 +5705,7 @@ exports.Transcriptions = Transcriptions;
 (function (Transcriptions) {
 })(Transcriptions = exports.Transcriptions || (exports.Transcriptions = {}));
 
-},{"openai/core":14,"openai/resource":27}],31:[function(require,module,exports){
+},{"openai/core":15,"openai/resource":28}],32:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5702,7 +5724,7 @@ exports.Translations = Translations;
 (function (Translations) {
 })(Translations = exports.Translations || (exports.Translations = {}));
 
-},{"openai/core":14,"openai/resource":27}],32:[function(require,module,exports){
+},{"openai/core":15,"openai/resource":28}],33:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -5768,7 +5790,7 @@ exports.BatchesPage = BatchesPage;
     Batches.BatchesPage = BatchesAPI.BatchesPage;
 })(Batches = exports.Batches || (exports.Batches = {}));
 
-},{"openai/core":14,"openai/pagination":26,"openai/resource":27,"openai/resources/batches":32}],33:[function(require,module,exports){
+},{"openai/core":15,"openai/pagination":27,"openai/resource":28,"openai/resources/batches":33}],34:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -5858,7 +5880,7 @@ exports.AssistantsPage = AssistantsPage;
     Assistants.AssistantsPage = AssistantsAPI.AssistantsPage;
 })(Assistants = exports.Assistants || (exports.Assistants = {}));
 
-},{"openai/core":14,"openai/pagination":26,"openai/resource":27,"openai/resources/beta/assistants":33}],34:[function(require,module,exports){
+},{"openai/core":15,"openai/pagination":27,"openai/resource":28,"openai/resources/beta/assistants":34}],35:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -5910,7 +5932,7 @@ exports.Beta = Beta;
     Beta.Threads = ThreadsAPI.Threads;
 })(Beta = exports.Beta || (exports.Beta = {}));
 
-},{"openai/resource":27,"openai/resources/beta/assistants":33,"openai/resources/beta/chat/chat":35,"openai/resources/beta/threads/threads":40,"openai/resources/beta/vector-stores/vector-stores":43}],35:[function(require,module,exports){
+},{"openai/resource":28,"openai/resources/beta/assistants":34,"openai/resources/beta/chat/chat":36,"openai/resources/beta/threads/threads":41,"openai/resources/beta/vector-stores/vector-stores":44}],36:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -5951,7 +5973,7 @@ exports.Chat = Chat;
     Chat.Completions = CompletionsAPI.Completions;
 })(Chat = exports.Chat || (exports.Chat = {}));
 
-},{"openai/resource":27,"openai/resources/beta/chat/completions":36}],36:[function(require,module,exports){
+},{"openai/resource":28,"openai/resources/beta/chat/completions":37}],37:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5991,7 +6013,7 @@ class Completions extends resource_1.APIResource {
 }
 exports.Completions = Completions;
 
-},{"openai/lib/ChatCompletionRunner":20,"openai/lib/ChatCompletionStream":21,"openai/lib/ChatCompletionStreamingRunner":22,"openai/lib/RunnableFunction":23,"openai/resource":27}],37:[function(require,module,exports){
+},{"openai/lib/ChatCompletionRunner":21,"openai/lib/ChatCompletionStream":22,"openai/lib/ChatCompletionStreamingRunner":23,"openai/lib/RunnableFunction":24,"openai/resource":28}],38:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -6081,7 +6103,7 @@ exports.MessagesPage = MessagesPage;
     Messages.MessagesPage = MessagesAPI.MessagesPage;
 })(Messages = exports.Messages || (exports.Messages = {}));
 
-},{"openai/core":14,"openai/pagination":26,"openai/resource":27,"openai/resources/beta/threads/messages":37}],38:[function(require,module,exports){
+},{"openai/core":15,"openai/pagination":27,"openai/resource":28,"openai/resources/beta/threads/messages":38}],39:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -6271,7 +6293,7 @@ exports.RunsPage = RunsPage;
     Runs.RunStepsPage = StepsAPI.RunStepsPage;
 })(Runs = exports.Runs || (exports.Runs = {}));
 
-},{"openai/core":14,"openai/lib/AssistantStream":19,"openai/pagination":26,"openai/resource":27,"openai/resources/beta/threads/runs/runs":38,"openai/resources/beta/threads/runs/steps":39}],39:[function(require,module,exports){
+},{"openai/core":15,"openai/lib/AssistantStream":20,"openai/pagination":27,"openai/resource":28,"openai/resources/beta/threads/runs/runs":39,"openai/resources/beta/threads/runs/steps":40}],40:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -6332,7 +6354,7 @@ exports.RunStepsPage = RunStepsPage;
     Steps.RunStepsPage = StepsAPI.RunStepsPage;
 })(Steps = exports.Steps || (exports.Steps = {}));
 
-},{"openai/core":14,"openai/pagination":26,"openai/resource":27,"openai/resources/beta/threads/runs/steps":39}],40:[function(require,module,exports){
+},{"openai/core":15,"openai/pagination":27,"openai/resource":28,"openai/resources/beta/threads/runs/steps":40}],41:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -6441,7 +6463,7 @@ exports.Threads = Threads;
     Threads.MessagesPage = MessagesAPI.MessagesPage;
 })(Threads = exports.Threads || (exports.Threads = {}));
 
-},{"openai/core":14,"openai/lib/AssistantStream":19,"openai/resource":27,"openai/resources/beta/threads/messages":37,"openai/resources/beta/threads/runs/runs":38}],41:[function(require,module,exports){
+},{"openai/core":15,"openai/lib/AssistantStream":20,"openai/resource":28,"openai/resources/beta/threads/messages":38,"openai/resources/beta/threads/runs/runs":39}],42:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6570,7 +6592,7 @@ exports.FileBatches = FileBatches;
 (function (FileBatches) {
 })(FileBatches = exports.FileBatches || (exports.FileBatches = {}));
 
-},{"openai/core":14,"openai/lib/Util":24,"openai/resource":27,"openai/resources/beta/vector-stores/files":42}],42:[function(require,module,exports){
+},{"openai/core":15,"openai/lib/Util":25,"openai/resource":28,"openai/resources/beta/vector-stores/files":43}],43:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -6719,7 +6741,7 @@ exports.VectorStoreFilesPage = VectorStoreFilesPage;
     Files.VectorStoreFilesPage = FilesAPI.VectorStoreFilesPage;
 })(Files = exports.Files || (exports.Files = {}));
 
-},{"openai/core":14,"openai/pagination":26,"openai/resource":27,"openai/resources/beta/vector-stores/files":42}],43:[function(require,module,exports){
+},{"openai/core":15,"openai/pagination":27,"openai/resource":28,"openai/resources/beta/vector-stores/files":43}],44:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -6819,7 +6841,7 @@ exports.VectorStoresPage = VectorStoresPage;
     VectorStores.FileBatches = FileBatchesAPI.FileBatches;
 })(VectorStores = exports.VectorStores || (exports.VectorStores = {}));
 
-},{"openai/core":14,"openai/pagination":26,"openai/resource":27,"openai/resources/beta/vector-stores/file-batches":41,"openai/resources/beta/vector-stores/files":42,"openai/resources/beta/vector-stores/vector-stores":43}],44:[function(require,module,exports){
+},{"openai/core":15,"openai/pagination":27,"openai/resource":28,"openai/resources/beta/vector-stores/file-batches":42,"openai/resources/beta/vector-stores/files":43,"openai/resources/beta/vector-stores/vector-stores":44}],45:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -6860,7 +6882,7 @@ exports.Chat = Chat;
     Chat.Completions = CompletionsAPI.Completions;
 })(Chat = exports.Chat || (exports.Chat = {}));
 
-},{"openai/resource":27,"openai/resources/chat/completions":45}],45:[function(require,module,exports){
+},{"openai/resource":28,"openai/resources/chat/completions":46}],46:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6875,7 +6897,7 @@ exports.Completions = Completions;
 (function (Completions) {
 })(Completions = exports.Completions || (exports.Completions = {}));
 
-},{"openai/resource":27}],46:[function(require,module,exports){
+},{"openai/resource":28}],47:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6885,7 +6907,7 @@ Object.defineProperty(exports, "Completions", { enumerable: true, get: function 
 var chat_1 = require("./chat.js");
 Object.defineProperty(exports, "Chat", { enumerable: true, get: function () { return chat_1.Chat; } });
 
-},{"./chat.js":44,"./completions.js":45}],47:[function(require,module,exports){
+},{"./chat.js":45,"./completions.js":46}],48:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6900,7 +6922,7 @@ exports.Completions = Completions;
 (function (Completions) {
 })(Completions = exports.Completions || (exports.Completions = {}));
 
-},{"openai/resource":27}],48:[function(require,module,exports){
+},{"openai/resource":28}],49:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6918,7 +6940,7 @@ exports.Embeddings = Embeddings;
 (function (Embeddings) {
 })(Embeddings = exports.Embeddings || (exports.Embeddings = {}));
 
-},{"openai/resource":27}],49:[function(require,module,exports){
+},{"openai/resource":28}],50:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -7035,7 +7057,7 @@ exports.FileObjectsPage = FileObjectsPage;
     Files.FileObjectsPage = FilesAPI.FileObjectsPage;
 })(Files = exports.Files || (exports.Files = {}));
 
-},{"openai/core":14,"openai/error":15,"openai/pagination":26,"openai/resource":27,"openai/resources/files":49}],50:[function(require,module,exports){
+},{"openai/core":15,"openai/error":16,"openai/pagination":27,"openai/resource":28,"openai/resources/files":50}],51:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -7078,7 +7100,7 @@ exports.FineTuning = FineTuning;
     FineTuning.FineTuningJobEventsPage = JobsAPI.FineTuningJobEventsPage;
 })(FineTuning = exports.FineTuning || (exports.FineTuning = {}));
 
-},{"openai/resource":27,"openai/resources/fine-tuning/jobs/jobs":52}],51:[function(require,module,exports){
+},{"openai/resource":28,"openai/resources/fine-tuning/jobs/jobs":53}],52:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -7126,7 +7148,7 @@ exports.FineTuningJobCheckpointsPage = FineTuningJobCheckpointsPage;
     Checkpoints.FineTuningJobCheckpointsPage = CheckpointsAPI.FineTuningJobCheckpointsPage;
 })(Checkpoints = exports.Checkpoints || (exports.Checkpoints = {}));
 
-},{"openai/core":14,"openai/pagination":26,"openai/resource":27,"openai/resources/fine-tuning/jobs/checkpoints":51}],52:[function(require,module,exports){
+},{"openai/core":15,"openai/pagination":27,"openai/resource":28,"openai/resources/fine-tuning/jobs/checkpoints":52}],53:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -7220,7 +7242,7 @@ exports.FineTuningJobEventsPage = FineTuningJobEventsPage;
     Jobs.FineTuningJobCheckpointsPage = CheckpointsAPI.FineTuningJobCheckpointsPage;
 })(Jobs = exports.Jobs || (exports.Jobs = {}));
 
-},{"openai/core":14,"openai/pagination":26,"openai/resource":27,"openai/resources/fine-tuning/jobs/checkpoints":51,"openai/resources/fine-tuning/jobs/jobs":52}],53:[function(require,module,exports){
+},{"openai/core":15,"openai/pagination":27,"openai/resource":28,"openai/resources/fine-tuning/jobs/checkpoints":52,"openai/resources/fine-tuning/jobs/jobs":53}],54:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -7251,7 +7273,7 @@ exports.Images = Images;
 (function (Images) {
 })(Images = exports.Images || (exports.Images = {}));
 
-},{"openai/core":14,"openai/resource":27}],54:[function(require,module,exports){
+},{"openai/core":15,"openai/resource":28}],55:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -7296,7 +7318,7 @@ Object.defineProperty(exports, "Models", { enumerable: true, get: function () { 
 var moderations_1 = require("./moderations.js");
 Object.defineProperty(exports, "Moderations", { enumerable: true, get: function () { return moderations_1.Moderations; } });
 
-},{"./audio/audio.js":28,"./batches.js":32,"./beta/beta.js":34,"./chat/index.js":46,"./completions.js":47,"./embeddings.js":48,"./files.js":49,"./fine-tuning/fine-tuning.js":50,"./images.js":53,"./models.js":55,"./moderations.js":56,"./shared.js":57}],55:[function(require,module,exports){
+},{"./audio/audio.js":29,"./batches.js":33,"./beta/beta.js":35,"./chat/index.js":47,"./completions.js":48,"./embeddings.js":49,"./files.js":50,"./fine-tuning/fine-tuning.js":51,"./images.js":54,"./models.js":56,"./moderations.js":57,"./shared.js":58}],56:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -7361,7 +7383,7 @@ exports.ModelsPage = ModelsPage;
     Models.ModelsPage = ModelsAPI.ModelsPage;
 })(Models = exports.Models || (exports.Models = {}));
 
-},{"openai/pagination":26,"openai/resource":27,"openai/resources/models":55}],56:[function(require,module,exports){
+},{"openai/pagination":27,"openai/resource":28,"openai/resources/models":56}],57:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -7379,12 +7401,12 @@ exports.Moderations = Moderations;
 (function (Moderations) {
 })(Moderations = exports.Moderations || (exports.Moderations = {}));
 
-},{"openai/resource":27}],57:[function(require,module,exports){
+},{"openai/resource":28}],58:[function(require,module,exports){
 "use strict";
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 Object.defineProperty(exports, "__esModule", { value: true });
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 (function (Buffer){(function (){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -7820,7 +7842,7 @@ function readableStreamAsyncIterable(stream) {
 exports.readableStreamAsyncIterable = readableStreamAsyncIterable;
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"./_shims/index.js":11,"./error.js":15,"buffer":2,"openai/error":15}],59:[function(require,module,exports){
+},{"./_shims/index.js":12,"./error.js":16,"buffer":2,"openai/error":16}],60:[function(require,module,exports){
 (function (Buffer){(function (){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -7988,7 +8010,7 @@ const addFormValue = async (form, key, value) => {
 };
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"./_shims/index.js":11,"buffer":2}],60:[function(require,module,exports){
+},{"./_shims/index.js":12,"buffer":2}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VERSION = void 0;

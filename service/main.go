@@ -113,6 +113,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				go func() {
 					msgch := make(chan []byte, 10)
+					defer close(msgch)
+
 					http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 						echo(w, r, msgch)
 					})
@@ -120,9 +122,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					go func() {
 						for msg := range msgch {
 							_, err = port.Write(msg)
-                            if (err != nil) {
-                                log.Fatal(err);
-                            }
+							if err != nil {
+								log.Fatal(err)
+							}
 						}
 					}()
 				}()
@@ -169,10 +171,13 @@ func (m model) View() string {
 
 func echo(w http.ResponseWriter, r *http.Request, msgch chan []byte) {
 	body, err := io.ReadAll(r.Body)
+    defer r.Body.Close()
 	if err != nil {
 		log.Fatal("Error reading request body:", err)
 	}
-	defer r.Body.Close()
-	io.WriteString(w, "ok!")
+    _, err = io.WriteString(w, fmt.Sprintf("ok, sent: %s", body))
+	if err != nil {
+		log.Fatal("Error writing request body:", err)
+	}
 	msgch <- body
 }

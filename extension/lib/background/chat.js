@@ -1,5 +1,6 @@
 const OpenAI = require('openai');
 const br = require('braille');
+const printStream = require('./printStream');
 const url = 'http://localhost:3000';
 
 async function chat(key, text) {
@@ -29,7 +30,7 @@ ${text}
             return response;
         })
         .then(data => {
-            console.log('Response:', data);
+            printStream(data.body);
         })
         .catch(error => {
             console.error('Error:', error.message);
