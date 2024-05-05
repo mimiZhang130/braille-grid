@@ -1,0 +1,10 @@
+{
+  "name": "braille-text",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "braille": "^1.1.0",
+    "openai": "^4.40.2"
+  }
+}
