@@ -10,6 +10,7 @@ async function printStream(stream) {
             }
             const decodedString = decoder.decode(value);
             console.log("Decoded response from service:", decodedString);
+            console.log("Decoded response from service:", value);
         }
     } finally {
         reader.releaseLock();
